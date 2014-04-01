@@ -15,13 +15,11 @@
   {% analytical_head_top %}
 
   {% block css %}
-  <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
   {% compress css %}
+  <link rel="stylesheet" href="{{STATIC_URL}}base/css/bootstrap.min.css">
   <link rel="stylesheet" href="{{STATIC_URL}}base/css/animate.css">
-  <link rel="stylesheet" href="{{STATIC_URL}}base/css/style.css">
   {% endcompress %}
   {% endblock %}
-
 
   <script src="{{STATIC_URL}}base/js/libs/modernizr-2.0.6.min.js"></script>
   {% analytical_head_bottom %}
@@ -30,23 +28,27 @@
 <body>
   {% analytical_body_top %}
   <div id="container">
+    <div id="nav">
+        {% block nav %}{% endblock %}
+    </div>
     <div id="main" role="main">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
     	{% block content %}
 
     	{% endblock %}
+                </div>
+            </div>
+        </div>
     </div>
   </div> 
 
-  {% compress js %}
-	<script type="text/javascript" src="{{STATIC_URL}}base/js/libs/jquery-1.6.2.min.js"></script>
-	<script type="text/javascript" src="{{STATIC_URL}}base/js/libs/underscore-min.js"></script>
-	<script type="text/javascript" src="{{STATIC_URL}}base/js/libs/backbone-min.js"></script>
-	<script type="text/javascript" src="{{STATIC_URL}}base/js/libs/ICanHaz.min.js"></script>
-	<script type="text/javascript" src="{{STATIC_URL}}base/js/libs/Three.js"></script>
-	<script type="text/javascript" src="{{STATIC_URL}}base/js/libs/easel.js"></script>
-  {% endcompress %}
   {% block js %}
-
+    {% compress js %}
+    <script src="{{STATIC_URL}}base/js/jquery-1.10.2.js"></script>
+    <script src="{{STATIC_URL}}base/js/bootstrap.min.js"></script>
+    {% endcompress %}
   {% endblock %}
 
   <!--[if lt IE 7 ]>

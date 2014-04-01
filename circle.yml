@@ -1,0 +1,27 @@
+dependencies:
+  override:
+    - pip install -r requirements.txt
+    
+test:
+  override:
+    - ./manage.py test --settings=envs.ci
+
+deployment:
+  staging:
+    branch: master
+    commands:
+      - heroku maintenance:on --app artechetype-staging
+      # - heroku scale celery=0 --app artechetype-staging
+      - git push git@heroku.com:artechetype-staging.git $CIRCLE_SHA1:master
+      - heroku run python manage.py syncdb --migrate --settings=envs.live --app artechetype-staging
+      - heroku restart --app artechetype-staging
+      - heroku maintenance:off --app artechetype-staging
+  live:
+    branch: live
+    commands:
+      - heroku maintenance:on --app artechetype
+      # - heroku scale celery=0 --app artechetype
+      - git push git@heroku.com:artechetype.git $CIRCLE_SHA1:master
+      - heroku run python manage.py syncdb --migrate --settings=envs.live --app artechetype
+      - heroku restart --app artechetype
+      - heroku maintenance:off --app artechetype

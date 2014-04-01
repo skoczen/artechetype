@@ -16,29 +16,40 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
+EMAIL_SUBJECT_PREFIX = "[artechetype] "
+SERVER_EMAIL = 'skoczen@gmail.com'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'project.sqlite3',                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': DB_PASSWORD,                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'artechetype',
+        'USER': 'skoczen',
+        'PASSWORD': DB_PASSWORD,
+        'HOST': '',
+        'PORT': '',
     }
 }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+ALLOWED_HOSTS = ["artechetype-staging.herokuapp.com", "artechetype.herokuapp.com"]
 
 TIME_ZONE = 'America/Vancouver'
 
 LANGUAGE_CODE = 'en-us'
 
 SITE_ID = 1
+LOGIN_URL = '/accounts/login/'
 
 USE_I18N = False
 USE_L10N = True
 
 MEDIA_ROOT = join(PROJECT_ROOT, "media_root")
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 STATIC_ROOT = join(PROJECT_ROOT, "collected_static")
 STATIC_URL = '/static/'
@@ -63,7 +74,6 @@ SECRET_KEY = '^7!$isr6jd!o+mgl1qy@+8197dm53uhp2i*vp8k4p#*g#8mg1n'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -74,10 +84,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'project.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
-    join(abspath(PROJECT_ROOT),"templates"),
+    join(abspath(PROJECT_ROOT), "templates"),
 )
 
 INSTALLED_APPS = (
@@ -87,19 +97,22 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'django.contrib.admin',
-    # 'django.contrib.admindocs',
+    'django.contrib.admin',
+    'django.contrib.admindocs',
 
     "analytical",
     "annoying",
     "compressor",
     "django_extensions",
-    "lettuce.django",
+    "djcelery",
     "gunicorn",
     "south",
 
     "main_site",
-    
+    "utils",
+
+    # Must come after south
+    "django_nose",
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
@@ -110,6 +123,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.core.context_processors.request",
 )
+
+import djcelery
+djcelery.setup_loader()
+BROKER_URL = 'redis://localhost:6379/6'
 
 
 STATICFILES_EXCLUDED_APPS = []
@@ -126,6 +143,7 @@ LOGGING = {
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
+            'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
         }
     },
@@ -135,5 +153,18 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-    }
+    },
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
 }
+import logging
+selenium_logger = logging.getLogger('selenium.webdriver.remote.remote_connection')
+selenium_logger.setLevel(logging.WARNING)
+logging.getLogger().setLevel(logging.WARNING)
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+BROWSER = "chrome"
+SOUTH_TESTS_MIGRATE = False

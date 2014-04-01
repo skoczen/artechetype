@@ -27,6 +27,7 @@ Grab it and go
 	
 	```bash
 	cd project
+    fab setup_db
 	./manage.py runserver
 	```
 
