@@ -1,14 +1,12 @@
 from fabric.api import *
 
-env.PROJECT_NAME = "artechetype"
+env.PROJECT_NAME = "pdxschoolhack"
 env.GITHUB_USER = "skoczen"
 env.GITHUB_REPO = env.PROJECT_NAME
 env.VIRTUALENV_NAME = env.PROJECT_NAME
 env.HEROKU_APP_NAME = env.PROJECT_NAME
 # If you're using https://github.com/ddollar/heroku-accounts
 env.HEROKU_ACCOUNT = "personal"
-env.app_string = ""
-env.DEV_DB_URL = "postgres://@localhost:5432/artechetype"
 
 env.SERVERS = {
     "live": "artechetype",
